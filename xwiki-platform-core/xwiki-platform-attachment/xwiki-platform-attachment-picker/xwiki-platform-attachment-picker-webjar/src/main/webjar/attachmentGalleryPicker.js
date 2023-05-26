@@ -28,30 +28,8 @@ define('xwiki-attachment-picker-translation-keys', {
   ]
 });
 
-define('xwiki-attachment-picker',
-  ['jquery', 'xwiki-attachments-icon', 'xwiki-l10n!xwiki-attachment-picker-translation-keys'],
-  function ($, attachmentsIcon, translations) {
-    'use strict';
-
-    const ATTACHMENT_PICKER_INITIALIZED_CLASS = 'initialized';
-
-    /**
-     * Utility function to debounce an event. The callback is delayed until no similar event is received before the end
-     * of the delay.
-     *
-     * @param callback the function to call when the delay is passed
-     * @param delay the delay in milliseconds before callback is called
-     * @returns {(function(...[*]): void)|*} the function to pass to the event handler
-     */
-    function debounce(callback, delay) {
-      let timeout;
-      return function (...args) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => callback.apply(this, args), delay);
-      };
-    }
-
-    /**
+define('xwiki-solr-search', ['jquery'], function($) {
+      /**
      * Handle the interaction with the solr search endpoint.
      */
     class SolrSearch {
@@ -85,7 +63,7 @@ define('xwiki-attachment-picker',
         return Promise.all(values).then(results => {
           /*
            * Take the attachments from the current document first. Then take the attachments from the global search that
-           *  are not from the current document (to avoid duplicates). At the end, only keep a fixed number of 
+           *  are not from the current document (to avoid duplicates). At the end, only keep a fixed number of
            * attachments (this.nb).
            */
           const localAttachments = results[0];
@@ -128,14 +106,24 @@ define('xwiki-attachment-picker',
           typesFqs = [];
         }
         const computedFqs = ['type:ATTACHMENT'].concat(optionsFqs).concat(typesFqs);
-        const query = computedFqs.map((fq) => 'fq=' + fq).join('\n');
+        const computedParams = [];
+
+        computedParams.push(...computedFqs.map((fq) => 'fq=' + fq));
+
+        if (options.sort) {
+          computedParams.push('sort=' + options.sort);
+        }
+
+        const query = computedParams.join('\n');
 
         return new Promise((resolve, reject) => {
           // TODO: handle more kind of scopes
           if (input === '') {
-            // Replace the empty string with '*', matching everything. 
+            // Replace the empty string with '*', matching everything.
             input = '*';
           }
+
+
           $.getJSON(this.sugestSolrServiceURL, {
             'query': query,
             'nb': this.limit,
@@ -151,6 +139,32 @@ define('xwiki-attachment-picker',
 
         });
       }
+    }
+
+    return SolrSearch;
+});
+
+define('xwiki-attachment-picker',
+  ['jquery', 'xwiki-attachments-icon', 'xwiki-l10n!xwiki-attachment-picker-translation-keys', 'xwiki-solr-search'],
+  function ($, attachmentsIcon, translations, SolrSearch) {
+    'use strict';
+
+    const ATTACHMENT_PICKER_INITIALIZED_CLASS = 'initialized';
+
+    /**
+     * Utility function to debounce an event. The callback is delayed until no similar event is received before the end
+     * of the delay.
+     *
+     * @param callback the function to call when the delay is passed
+     * @param delay the delay in milliseconds before callback is called
+     * @returns {(function(...[*]): void)|*} the function to pass to the event handler
+     */
+    function debounce(callback, delay) {
+      let timeout;
+      return function (...args) {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => callback.apply(this, args), delay);
+      };
     }
 
     /**
