@@ -17,48 +17,51 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.ckeditor.test.ui;
+package org.xwiki.ckeditor.test.po;
 
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.xwiki.test.docker.junit5.UITest;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.openqa.selenium.WebElement;
+import org.xwiki.stability.Unstable;
+import org.xwiki.test.ui.po.BaseElement;
+
 
 /**
- * All functional tests for the CKEditor integration.
+ * Models a Quick Action drop-down.
  *
  * @version $Id$
- * @since 1.53.2
+ * @since 15.5RC1
  */
-@UITest
-public class AllIT
+@Unstable
+public class QuickActionDropdown extends BaseElement
 {
-    @Nested
-    @DisplayName("Save")
-    class NestedSaveIT extends SaveIT
+    
+    /**
+     * The associated CKEditor instance.
+     */
+    private final CKEditor editor;
+    
+    /**
+     * Creates a new Quick Action drop-down instance.
+     * 
+     * @param editor - CKEditor instance
+     */
+    public QuickActionDropdown(CKEditor editor)
     {
-    }
-
-    @Nested
-    @DisplayName("Image Plugin")
-    class NestedImagePluginIT extends ImagePluginIT
-    {
-    }
-
-    @Nested
-    @DisplayName("TextArea Editor")
-    class NestedTextAreaIT extends TextAreaIT
-    {
-    }
-
-    @Nested
-    @DisplayName("Link Plugin")
-    class NestedLinkPluginIT extends LinkPluginIT
-    {
+//        this.query = "/";
+        this.editor = editor;
     }
     
-    @Nested
-    @DisplayName("Quick Action")
-    class NestedQuickActionIT extends QuickActionIT
+    
+    /**
+     * Retrieve the list of Quick Actions.
+     * 
+     * @return the Quick Actions
+     */
+    public List<WebElement> getQuickActions()
     {
+        return new ArrayList<>();
     }
+    
 }
