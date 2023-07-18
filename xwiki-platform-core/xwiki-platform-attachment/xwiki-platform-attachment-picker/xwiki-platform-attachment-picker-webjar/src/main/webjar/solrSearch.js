@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-define('xwiki-solr-search', ['jquery'], function($) {
+define('xwiki-attachment-picker-solr-search', ['jquery'], function($) {
       /**
      * Handle the interaction with the solr search endpoint.
      */

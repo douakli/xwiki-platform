@@ -151,10 +151,6 @@
   #set ($macro.results = $query.execute()[0].results)
   #foreach ($result in $macro.results)
     #set ($resultReference = $services.solr.resolve($result))
-    #set ($options = {
-      'excludeSelf': true,
-      'limit': 4
-    })
     #set ($result.location = "#hierarchy($resultReference {'local': true, 'excludeSelf': true, 'plain': true})")
   #end
   #set ($results = $NULL)

@@ -102,7 +102,7 @@
     },
     init: function(editor) {
 
-      // Register the the /img:: autocomplete
+      // Register the the /img:: autocomplete using the ckeditor mentions plugin
       editor.config.mentions = editor.config.mentions || [];
 
       editor.config.mentions.push({
@@ -240,7 +240,8 @@
               localQuery, globalQuery, wildcardQuery
             ]).then(function (values) {
 
-              const finalItems = [...topItems];
+              // We do not do a copy of the array since it won't be used afterwards anyways
+              const finalItems = topItems;
 
               // Keep track of the items already in the list to avoid duplicates
               const includedIds = {};

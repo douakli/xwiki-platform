@@ -345,6 +345,8 @@
           var left = text.slice(0, offset),
               // Will look for the marker followed by text.
               match = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}$')),
+              // Do not show the Quick Actions dropdown when the query contains '::'
+              // Because another dropdown might appear
               subMatch = left.match(new RegExp(escapeRegExp(config.marker) + '.{0,30}::\\S{0,30}$'));
           if (match && !subMatch) {
             return {

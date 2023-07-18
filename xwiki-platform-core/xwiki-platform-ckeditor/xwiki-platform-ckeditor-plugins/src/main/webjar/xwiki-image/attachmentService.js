@@ -20,7 +20,7 @@
 
 define('attachmentService', [
   'jquery',
-  'xwiki-solr-search',
+  'xwiki-attachment-picker-solr-search',
 ], function ($, SolrSearch) {
 
   // Attachment cache
@@ -36,28 +36,28 @@ define('attachmentService', [
   clearCache();
 
   var getAttachments = function (query, isGlobal, force, editor, sort) {
-    var deferred = $.Deferred();
 
-    var cached = attachmentsByQuery[(isGlobal ? "global" : "local")][query];
+    return new Promise(function (resolve) {
 
-    if (cached && !force) {
-      return deferred.resolve(cached).promise();
-    }
+      var cached = attachmentsByQuery[(isGlobal ? "global" : "local")][query];
 
-    const solrSearch = new SolrSearch({
-        limit: 100,
-        target: XWiki.Model.serialize(editor.config.sourceDocument.documentReference),
-        solrOptions: {
-          sort: "attdate_sort " + sort
-        }
+      if (cached && !force) {
+        return resolve(cached);
+      }
+
+      const solrSearch = new SolrSearch({
+          limit: 100,
+          target: XWiki.Model.serialize(editor.config.sourceDocument.documentReference),
+          solrOptions: {
+            sort: "attdate_sort " + sort
+          }
+      });
+
+      solrSearch.search(query, isGlobal).then(function (data) {
+        attachmentsByQuery[(isGlobal ? "global" : "local")][query] = data;
+        resolve(data);
+      });
     });
-
-    solrSearch.search(query, isGlobal).then(function (data) {
-      attachmentsByQuery[(isGlobal ? "global" : "local")][query] = data;
-      deferred.resolve(data);
-    });
-
-    return deferred.promise();
 
   };
 

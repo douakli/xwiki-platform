@@ -602,11 +602,11 @@ path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-
       <extensionPointId>org.xwiki.platform.requirejs.module</extensionPointId>
     </property>
     <property>
-      <name>org.xwiki.platform.image.picker.requirejs.module.xwiki-solr-search</name>
+      <name>org.xwiki.platform.image.picker.requirejs.module.xwiki-attachment-picker-solr-search</name>
     </property>
     <property>
-      <parameters>id=xwiki-solr-search
-path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 'attachmentGalleryPicker.min')</parameters>
+      <parameters>id=xwiki-attachment-picker-solr-search
+path=$services.webjars.url('org.xwiki.platform:xwiki-platform-attachment-picker-webjar', 'solrSearch.min')</parameters>
     </property>
     <property>
       <scope></scope>
