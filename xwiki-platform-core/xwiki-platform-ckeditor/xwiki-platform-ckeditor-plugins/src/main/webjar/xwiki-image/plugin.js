@@ -102,7 +102,7 @@
     },
     init: function(editor) {
 
-      // Register the the /img:: autocomplete using the ckeditor mentions plugin
+      // Register the the /img:: autocomplete using the ckeditor mentions plugin.
       editor.config.mentions = editor.config.mentions || [];
 
       editor.config.mentions.push({
@@ -112,7 +112,7 @@
         itemsLimit: 5,
         itemTemplate: '<li data-id="{id}">' +
 
-          // Allow different display for non image entries
+          // Allow different display for non image entries.
           '<div class="ckeditor-autocomplete-item-head {extraClass}">' +
 
             '<span class="ckeditor-autocomplete-item-{type}-wrapper">' +
@@ -182,7 +182,7 @@
                 type: "icon",
               };
 
-            // Upload image item should be the first in the list
+            // Upload image item should be the first in the list.
             const topItems = [];
             if (uploadItem.label.toLowerCase().startsWith(opts.query.toLowerCase())) {
               topItems.push(uploadItem);
@@ -197,25 +197,25 @@
 
             callback(topItems.concat([loadingItem]));
 
-            // Start all the Solr Queries
+            // Start all the Solr Queries.
             const localQuery = attachmentService.getAttachments(`*${opts.query}*`, false, false, editor, "desc");
             const globalQuery = attachmentService.getAttachments(`*${opts.query}*`, true, false, editor, "desc");
 
             const wildcardLocalQuery = attachmentService.getAttachments("*", true, false, editor, "desc");
             const wildcardGlobalQuery = attachmentService.getAttachments("*", true, false, editor, "desc");
 
-            // Display the wildcard query result first because it is more likely to be cached
+            // Display the wildcard query result first because it is more likely to be cached.
             const wildcardQuery = Promise.all(
-              // Display local results higher in the list
+              // Display local results higher in the list.
               [wildcardLocalQuery, wildcardGlobalQuery]
             ).then(function (values) {
-              // Show a loading entry until we show the result from the specific query
+              // Show a loading entry until we show the result from the specific query.
               const wildcardItems = [...topItems, loadingItem];
 
-              // Store the attachments so we can display them once we get the specific query results
+              // Store the attachments so we can display them once we get the specific query results.
               const wildcardAttachments = [];
 
-              // Keep track of the items already in the list to avoid duplicates
+              // Keep track of the items already in the list to avoid duplicates.
               const wildcardIncludedIds = {};
               values.flat().forEach(function (attachment) {
                 if (isImage(attachment) &&
@@ -228,22 +228,22 @@
                 }
               });
 
-              // Show the wildcard query's results
+              // Show the wildcard query's results.
               callback(wildcardItems);
 
               return wildcardAttachments;
             });
 
-            // Display all the results once the solr requests are finished
+            // Display all the results once the solr requests are finished.
             Promise.all([
-              // Display the specific query results higher in the list
+              // Display the specific query results higher in the list.
               localQuery, globalQuery, wildcardQuery
             ]).then(function (values) {
 
-              // We do not do a copy of the array since it won't be used afterwards anyways
+              // We do not do a copy of the array since it won't be used afterwards anyways.
               const finalItems = topItems;
 
-              // Keep track of the items already in the list to avoid duplicates
+              // Keep track of the items already in the list to avoid duplicates.
               const includedIds = {};
               values.flat().forEach(function (attachment) {
                 if (isImage(attachment) && !includedIds[attachment.id]) {
@@ -252,7 +252,7 @@
                 }
               });
 
-              // Show the final results
+              // Show the final results.
               callback(finalItems);
             });
           });
