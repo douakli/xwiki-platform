@@ -49,6 +49,7 @@ define('imageWizard', ['jquery', 'imageSelector', 'imageEditor'], function($, im
       params.currentDocument = CKEDITOR.currentInstance.config.sourceDocument.documentReference;
     }
 
+    // Skip the wizard if setImageData is set.
     if (params.setImageData) {
       return $.Deferred().resolve(params.setImageData);
     }

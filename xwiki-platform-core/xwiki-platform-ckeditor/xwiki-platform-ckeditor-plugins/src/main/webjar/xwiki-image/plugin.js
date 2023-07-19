@@ -37,7 +37,8 @@
     });
   }
 
-  function showImageWizard(editor, widget, isInsert, args) {
+  // The setImageData argument can be used to skip the Image Wizard.
+  function showImageWizard(editor, widget, isInsert, setImageData) {
 
     /**
      * Only called to unwrap the centered images inserted by the old image dialog.
@@ -56,7 +57,7 @@
         editor: editor,
         imageData: widget.data,
         isInsert: isInsert,
-        setImageData: args && args.setImageData
+        setImageData: setImageData
       }).done(function(data) {
         if (widget && widget.element) {
           widget.setData(data);
@@ -117,7 +118,7 @@
 
             '<span class="ckeditor-autocomplete-item-{type}-wrapper">' +
               '<span class="{iconClass}" aria-hidden="true"></span>' +
-              '<img src="{imgSrc}" aria-hidden="true"></img>' +
+              '<img src="{imgSrc}" aria-hidden="true"/>' +
             '</span>' +
 
             '<div class="ckeditor-autocomplete-item">' +
@@ -172,15 +173,15 @@
             };
 
             const uploadItem = {
-                id: "_uploadImage",
-                label: editor.localization.get('xwiki-image.slash.upload'),
-                iconClass: "fa fa-upload",
-                extraClass: "ckeditor-autocomplete-centered",
-                space: "",
-                badge: "",
-                imgSrc: "",
-                type: "icon",
-              };
+              id: "_uploadImage",
+              label: editor.localization.get('xwiki-image.slash.upload'),
+              iconClass: "fa fa-upload",
+              extraClass: "ckeditor-autocomplete-centered",
+              space: "",
+              badge: "",
+              imgSrc: "",
+              type: "icon",
+            };
 
             // Upload image item should be the first in the list.
             const topItems = [];
@@ -277,79 +278,83 @@
               $(editor.document.$).loadRequiredSkinExtensions(requiredSkinExtensions);
 
               require(['attachmentService',
-                      'xwiki-attachments-store',
-                      'xwiki-file-picker'],
-                      function (attachmentService, attachmentsStore, filePicker) {
+                  'xwiki-attachments-store',
+                  'xwiki-file-picker'
+                ],
+                function (attachmentService, attachmentsStore, filePicker) {
 
-                const convertFilesToAttachments = function (files, documentReference) {
-                  const attachments = [];
-                  for (var i = 0; i < files.length; i++) {
-                    const file = files.item(i);
-                    const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
-                      documentReference);
-                    attachments.push(attachmentsStore.create(attachmentReference, file));
-                  }
-                  return attachments;
-                };
+                  const convertFilesToAttachments = function (files, documentReference) {
+                    const attachments = [];
+                    for (var i = 0; i < files.length; i++) {
+                      const file = files.item(i);
+                      const attachmentReference = new XWiki.EntityReference(file.name, XWiki.EntityType.ATTACHMENT,
+                        documentReference);
+                      attachments.push(attachmentsStore.create(attachmentReference, file));
+                    }
+                    return attachments;
+                  };
 
-                // Open the file picker
-                filePicker.pickLocalFiles({
-                  accept: "image/*",
-                  multiple: false
-                }).then(function (files) {
-                  const attachments = convertFilesToAttachments(files, editor.config.sourceDocument.documentReference);
-
-                  // Cancel the insertion when no image is picked
-                  if (attachments.length === 0) {
-                    return;
-                  }
-
-                  const attachment = attachments[0];
-
-                  const notification = new XWiki.widgets.Notification(
-                    editor.localization.get('xwiki-image.slash.uploadProgress', attachment.name),
-                    'inprogress');
-
-                  // Upload the selected image
-                  const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
-                  attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
-                    notification.replace(
-                      new XWiki.widgets.Notification(
-                        editor.localization.get('xwiki-image.slash.uploadSuccess', attachment.name),
-                        'done')
+                  // Open the file picker
+                  filePicker.pickLocalFiles({
+                    accept: "image/*",
+                    multiple: false
+                  }).then(function (files) {
+                    const attachments = convertFilesToAttachments(
+                      files,
+                      editor.config.sourceDocument.documentReference
                     );
-                    // Clear the cache so the new image can appear on next usage of the image quick action
-                    attachmentService.clearCache();
 
-                    // Insert the newly uploaded image
-                    imageWidget.insert({
-                      setImageData: {
-                        resourceReference: {
-                          type: "attach",
-                          typed: false,
-                          reference: attachment.id
-                        },
-                        src: CKEDITOR.plugins.xwikiResource.getResourceURL({
-                          type: "attach",
-                          typed: false,
-                          reference: attachment.id
-                        }, editor)
-                      }
+                    // Cancel the insertion when no image is picked
+                    if (attachments.length === 0) {
+                      return;
+                    }
+
+                    const attachment = attachments[0];
+
+                    const notification = new XWiki.widgets.Notification(
+                      editor.localization.get('xwiki-image.slash.uploadProgress', attachment.name),
+                      'inprogress');
+
+                    // Upload the selected image
+                    const attachmentReference = XWiki.Model.resolve(attachment.id, XWiki.EntityType.ATTACHMENT);
+                    attachmentsStore.upload(attachmentReference, attachment.file).then(() => {
+                      notification.replace(
+                        new XWiki.widgets.Notification(
+                          editor.localization.get('xwiki-image.slash.uploadSuccess', attachment.name),
+                          'done')
+                      );
+                      // Clear the cache so the new image can appear on next usage of the image quick action
+                      attachmentService.clearCache();
+
+                      // Insert the newly uploaded image
+                      imageWidget.insert({
+                        setImageData: {
+                          resourceReference: {
+                            type: "attach",
+                            typed: false,
+                            reference: attachment.id
+                          },
+                          src: CKEDITOR.plugins.xwikiResource.getResourceURL({
+                            type: "attach",
+                            typed: false,
+                            reference: attachment.id
+                          }, editor)
+                        }
+                      });
+                    }).catch(() => {
+                      notification.replace(
+                        new XWiki.widgets.Notification(
+                          editor.localization.get('xwiki-image.slash.uploadError', attachment.name),
+                          'error')
+                      );
+                      return Promise.reject();
                     });
-                  }).catch(() => {
-                    notification.replace(
-                      new XWiki.widgets.Notification(
-                        editor.localization.get('xwiki-image.slash.uploadError', attachment.name),
-                        'error')
-                    );
-                    return Promise.reject();
                   });
                 });
-              });
 
             });
 
-          return "";
+            return "";
           }
 
           // Insert the selected image
@@ -378,7 +383,7 @@
       var imageWidget = editor.widgets.registered.image;
 
       imageWidget.insert = function(args) {
-        showImageWizard(editor, this, true, args);
+        showImageWizard(editor, this, true, args && args.setImageData);
       };
       imageWidget.edit = function(event) {
         // Prevent the default behavior because we want to use our custom image dialog.

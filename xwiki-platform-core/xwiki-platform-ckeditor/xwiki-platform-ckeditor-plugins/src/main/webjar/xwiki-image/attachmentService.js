@@ -46,11 +46,11 @@ define('attachmentService', [
       }
 
       const solrSearch = new SolrSearch({
-          limit: 100,
-          target: XWiki.Model.serialize(editor.config.sourceDocument.documentReference),
-          solrOptions: {
-            sort: "attdate_sort " + sort
-          }
+        limit: 40,
+        target: XWiki.Model.serialize(editor.config.sourceDocument.documentReference),
+        solrOptions: {
+          sort: "attdate_sort " + sort
+        }
       });
 
       solrSearch.search(query, isGlobal).then(function (data) {
