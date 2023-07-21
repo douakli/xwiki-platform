@@ -377,6 +377,88 @@
         }
       });
 
+      // Icon Autocomplete
+
+      const registerIconDropdown = function (name, theme, isImage) {
+        editor.config.mentions.push({
+          marker: `/${name}::`,
+          pattern: new RegExp('/' + name + '::\\S{0,30}$'),
+          minChars: 0,
+          itemsLimit: 0,
+          itemTemplate: '<li data-id="{id}">' +
+            '<div class="ckeditor-autocomplete-item-head">' +
+            '<span class="ckeditor-autocomplete-item-icon-wrapper">' +
+            '<span class="{iconClass}" aria-hidden="true"></span>' +
+            '<img src="{imgSrc}" aria-hidden="true"></img>' +
+            '</span>' +
+            '<span class="ckeditor-autocomplete-item-label">{label}</span>' +
+            '</div>' +
+            '</li>',
+          feed: function (opts, callback) {
+            require(['iconService'], function (iconService) {
+              iconService.getIconThemes().then(function (iconThemes) {
+
+
+                // Use the current theme when none is provided.
+                let iconTheme = theme;
+                if (!iconThemes.iconThemes.includes(iconTheme)) {
+                  iconTheme = iconThemes.currentIconTheme;
+                }
+
+                // Retreive the list of available icons.
+                iconService.getIcons(iconTheme).then(function (icons) {
+                  const items = [];
+                  icons.forEach(function (icon) {
+                    if (icon.name.toLowerCase().startsWith(opts.query.toLowerCase())) {
+                      items.push({
+                        id: icon.name,
+                        label: icon.name,
+                        imgSrc: icon.metadata.url,
+                        reference: icon.metadata.value,
+                        iconClass: icon.metadata.cssClass
+                      });
+                    }
+                  });
+                  callback(items);
+                });
+
+              });
+            });
+
+          },
+          outputTemplate: function (item) {
+
+            if (isImage) {
+              const imageWidget = editor.widgets.registered.image;
+              imageWidget.insert({
+                setImageData: {
+                  resourceReference: {
+                    type: "icon",
+                    typed: true,
+                    reference: item.reference
+                  },
+                  src: item.imgSrc
+                }
+              });
+            } else {
+              editor.execCommand('xwiki-macro-insert', {
+                name: "displayIcon",
+                parameters: {
+                  name: item.id,
+                },
+                // Displaying the macro inline allows to write text around the icon after insertion.
+                inline: "enforce",
+              });
+            }
+
+            return "";
+          }
+        });
+      };
+
+      registerIconDropdown("icon");
+      registerIconDropdown("img-icon", "Silk", true);
+
       this.initImageDialogWidget(editor);
     },
     initImageDialogWidget: function(editor) {
