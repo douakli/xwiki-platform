@@ -36,7 +36,7 @@ define('iconService', [
 
   let cachedIconThemes = false;
   const getIconThemes = function () {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
 
       if (cachedIconThemes) {
         return resolve(cachedIconThemes);
@@ -45,13 +45,13 @@ define('iconService', [
       $.getJSON(getResourceURL('data_iconthemes'), function (data) {
         cachedIconThemes = data;
         resolve(data);
-      });
+      }).fail(reject);
     });
   };
 
   const cachedIcons = {};
   const getIcons = function (iconTheme) {
-    return new Promise(function (resolve) {
+    return new Promise(function (resolve, reject) {
 
       if (cachedIcons[iconTheme]) {
         resolve(cachedIcons[iconTheme]);
@@ -60,7 +60,7 @@ define('iconService', [
       $.getJSON(getResourceURL('data_icons', 'iconTheme=' + iconTheme), function (dataIcons) {
         cachedIcons[iconTheme] = dataIcons;
         resolve(dataIcons);
-      });
+      }).fail(reject);
     });
   };
 

@@ -49,10 +49,6 @@ public interface IconManager
      * CSS class of the icon.
      */
     String META_DATA_CSS_CLASS = "cssClass";
-    /**
-     * The value of the icon.
-     */
-    String META_DATA_VALUE = "value";
 
     /**
      * Generate the wiki syntax to display an icon with the current icon theme.

@@ -719,13 +719,6 @@
           outputHTML: '/icon::'
         }, {
           group: 'Content',
-          id: 'img-icon',
-          name: editor.localization.get('xwiki-slash.action.img-icon.name'),
-          iconClass: 'fa fa-image',
-          description: editor.localization.get('xwiki-slash.action.img-icon.hint'),
-          outputHTML: '/img-icon::'
-        }, {
-          group: 'Content',
           id: 'mention',
           name: editor.localization.get('xwiki-slash.action.mention.name'),
           iconClass: 'fa fa-user-o',

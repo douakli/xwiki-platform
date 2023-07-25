@@ -119,7 +119,6 @@ public class DefaultIconManager implements IconManager
             metaData.put(META_DATA_ICON_SET_TYPE, iconSet.getType().name());
             metaData.put(META_DATA_URL, iconRenderer.render(iconName, iconSet, iconSet.getIconUrl()));
             metaData.put(META_DATA_CSS_CLASS, iconRenderer.render(iconName, iconSet, iconSet.getIconCssClass()));
-            metaData.put(META_DATA_VALUE, iconSet.getIcon(iconName).getValue());
         }
 
         return metaData;
